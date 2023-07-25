@@ -1,0 +1,23 @@
+{
+  "name": "product-manager-ajmr",
+  "version": "1.0.0",
+  "description": "Resources",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm start",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "LP-Resources"
+  },
+  "keywords": [
+    "resources"
+  ],
+  "author": "Lynx Pardelle",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
