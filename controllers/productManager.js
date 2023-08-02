@@ -1,19 +1,24 @@
 const fs = require("fs");
 class ProductManager {
+  file = "products.json";
   constructor(path = "./") {
     this.products = [];
     this.id = 0;
     this.path = path;
     (async () => {
       try {
-        if (!(await fs.existsSync(this.path))) {
-          await fs.mkdirSync(this.path, { recursive: true });
+        try {
+          await this.readFile();
+        } catch (error) {
+          if (!(await fs.existsSync(this.path))) {
+            await fs.mkdirSync(this.path, { recursive: true });
+          }
+          await fs.writeFileSync(
+            this.path + this.file,
+            JSON.stringify(this.products),
+            "utf-8"
+          );
         }
-        await fs.writeFileSync(
-          this.path + "products.txt",
-          JSON.stringify(this.products),
-          "utf-8"
-        );
       } catch (error) {
         console.error("Error writing file");
         console.error(error);
@@ -24,6 +29,16 @@ class ProductManager {
   /* Create */
   async addProduct(product) {
     try {
+      console.log(product);
+      if (
+        !product.title ||
+        !product.description ||
+        !product.price ||
+        !product.stock ||
+        !product.code ||
+        !product.category
+      )
+        throw new Error("Missing data");
       let fileReaded = await this.readFile();
       if (fileReaded?.status !== "success")
         throw new Error("Error reading file");
@@ -35,10 +50,12 @@ class ProductManager {
           title: product.title,
           description: product.description,
           price: product.price,
-          thumbnail: product.thumbnail,
+          thumbnails: product.thumbnail,
           code: await this.getRandomCode(product.code),
           stock: product.stock,
-          id: this.id,
+          id: this.products.length + 1,
+          status: product.status || true,
+          category: product.category,
         };
         this.id++;
         this.products.push(newProduct);
@@ -68,6 +85,11 @@ class ProductManager {
         throw new Error("Error reading file");
       if (!this.products || this.products.length === 0)
         throw new Error("There are no products");
+      this.products.forEach((product) => {
+        if (!!product.id && product.id == this.id) {
+          this.id++;
+        }
+      });
       return {
         status: "success",
         message: "Products listed successfully",
@@ -117,8 +139,10 @@ class ProductManager {
       product.title = product2Update.title;
       product.description = product2Update.description;
       product.price = product2Update.price;
-      product.thumbnail = product2Update.thumbnail;
+      product.thumbnails = product2Update.thumbnails;
       product.stock = product2Update.stock;
+      product.status = product2Update.status;
+      product.category = product2Update.category;
       let fileWritten = await this.writeFile();
       if (fileWritten?.status !== "success")
         throw new Error("Error writing file");
@@ -169,7 +193,7 @@ class ProductManager {
   async readFile() {
     try {
       let products = this.products;
-      products = fs.readFileSync(this.path + "products.txt", "utf-8");
+      products = await fs.readFileSync(this.path + this.file, "utf-8");
       this.products = !!products ? JSON.parse(products) : [];
       return {
         status: "success",
@@ -185,7 +209,7 @@ class ProductManager {
   async writeFile() {
     try {
       await fs.writeFileSync(
-        this.path + "products.txt",
+        this.path + this.file,
         JSON.stringify(this.products),
         "utf-8"
       );
@@ -224,47 +248,25 @@ class ProductManager {
     }
   }
 }
+const productManager = new ProductManager("./data/");
+/* Create 10 products for testing */
+setTimeout(() => {
+  (async () => {
+    let products = await productManager.getProducts();
+    if (!products || !products.data || products.data.length < 10) {
+      for (let i = 0; i < 10; i++) {
+        await productManager.addProduct({
+          title: `Product ${i}`,
+          description: `Description ${i}`,
+          price: Math.floor(Math.random() * 1000),
+          thumbnails: `Thumbnail ${i}`,
+          code: `Code ${i}`,
+          stock: Math.floor(Math.random() * 100),
+          category: `Category ${i}`,
+        });
+      }
+    }
+  })();
+}, 1000);
 /* Module export */
-module.exports = ProductManager;
-
-/* 
-// Testing:
-let productManager = new ProductManager();
-console.log(productManager.getProducts());
-productManager.addProduct(
-  {
-    title: "producto prueba",
-    description: "Este es un producto prueba",
-    price: 200,
-    thumbnail: "Sin imagen",
-    code: "abc123",
-    stock: 25
-  }
-);
-console.log(productManager.getProducts());
-productManager.addProduct(
-  {
-    title: "producto prueba",
-    description: "Este es un producto prueba",
-    price: 200,
-    thumbnail: "Sin imagen",
-    code: "abc123",
-    stock: 25
-  }
-);
-console.log(productManager.getProductById(0));
-console.log(productManager.getProductById(1));
-productManager.updateProduct(
-  0,
-  { title:"producto prueba(cambiado)",
-    description:"Este es un producto prueba(cambiado)",
-    price: 201,
-    thumbnail: "Sin imagen",
-    stock :24
-  }
-);
-console.log(productManager.getProductById(0));
-productManager.deleteProduct(0);
-console.log(productManager.getProductById(0));
-console.log(productManager.getProducts()); 
-*/
+module.exports = productManager;
