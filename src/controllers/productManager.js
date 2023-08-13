@@ -1,4 +1,4 @@
-const fs = require("fs");
+import fs from "fs";
 class ProductManager {
   file = "products.json";
   constructor(path = "./") {
@@ -269,4 +269,4 @@ setTimeout(() => {
   })();
 }, 1000);
 /* Module export */
-module.exports = productManager;
+export default productManager;

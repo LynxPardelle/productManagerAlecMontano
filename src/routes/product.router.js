@@ -1,5 +1,6 @@
-const productManager = require("../controllers/productManager");
-const router = require("express").Router();
+import productManager from "../controllers/productManager.js";
+import express from "express";
+const router = express.Router();
 router.get("/", async (req, res) => {
   res.json(await productManager.getProducts(req.query.limit));
 });
@@ -15,4 +16,4 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   res.json(await productManager.deleteProduct(req.params.id));
 });
-module.exports = router;
+export default router;
