@@ -1,19 +1,19 @@
-import productManager from "../controllers/productManager.js";
+import { productController } from "../dao/product.controller.js";
 import express from "express";
 const router = express.Router();
 router.get("/", async (req, res) => {
-  res.json(await productManager.getProducts(req.query.limit));
+  res.json(await productController.getProducts(req.query.limit));
 });
 router.get("/:pid", async (req, res) => {
-  res.json(await productManager.getProductById(req.params.pid));
+  res.json(await productController.getProductById(req.params.pid));
 });
 router.post("/", async (req, res) => {
-  res.json(await productManager.addProduct(req.body));
+  res.json(await productController.addProduct(req.body));
 });
 router.put("/:id", async (req, res) => {
-  res.json(await productManager.updateProduct(req.params.id, req.body));
+  res.json(await productController.updateProduct(req.params.id, req.body));
 });
 router.delete("/:id", async (req, res) => {
-  res.json(await productManager.deleteProduct(req.params.id));
+  res.json(await productController.deleteProduct(req.params.id));
 });
 export default router;

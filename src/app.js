@@ -4,12 +4,19 @@ import handlebars from "express-handlebars";
 import __dirname from "./utils.js";
 import viewsRouter from "./routes/views.router.js";
 import { Server } from "socket.io";
+import mongoose from "mongoose";
 /* Run server */
 const app = express();
 const PORT = 8080;
 const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+mongoose
+  .connect(
+    "mongodb+srv://lnxdrk:Xi7neP4j0Eqyi9cd@productmanagermontano.zazjp31.mongodb.net/?retryWrites=true&w=majority"
+  )
+  .catch((error) => console.error(error));
+
 /* Socket.io */
 const io = new Server(server);
 io.on("connection", (socket) => {
@@ -60,6 +67,80 @@ io.on("connection", (socket) => {
       });
     }
   });
+  /* Chat */
+  socket.on("user-join", (data) => {
+    socket.broadcast.emit("send-message", {
+      data: {
+        date: data.date,
+        message: data.user + " ha entrado al chat.",
+        user: "System",
+      },
+      message: "Message added successfully",
+      status: "success",
+    });
+  });
+  socket.on("new-message", async (data) => {
+    try {
+      let message = {
+        status: "error",
+        message: "No se pudo enviar el mensaje.",
+      };
+      let messageFromServer = await fetch(
+        "http://localhost:8080/api/messages/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (messageFromServer.status === 200) {
+        message = await messageFromServer.json();
+      } else {
+        console.log(messageFromServer);
+        throw new Error("No se pudo enviar el mensaje.");
+      }
+      io.sockets.emit("send-message", message);
+    } catch (error) {
+      io.sockets.emit("error", {
+        status: "error",
+        message: "hubo un error en el servidor al intentar enviar el mensaje.",
+        error,
+      });
+    }
+  });
+  socket.on("get-messages", async (limit) => {
+    try {
+      let messages = {
+        status: "error",
+        message: "No se encontraron mensajes.",
+      };
+      let messagesFromServer = await fetch(
+        `http://localhost:8080/api/messages/?limit=${limit}`
+      );
+      if (messagesFromServer.status === 200) {
+        messages = await messagesFromServer.json();
+      } else {
+        console.log(messagesFromServer);
+        throw new Error("No se pudo obtener los mensajes.");
+      }
+      io.sockets.emit("send-messages", messages);
+    } catch (error) {
+      io.sockets.emit("error", {
+        status: "error",
+        message:
+          "hubo un error en el servidor al intentar obtener los mensajes.",
+        error,
+      });
+    }
+  });
+  socket.on("error", (error) => {
+    console.log(error);
+  });
+  socket.on("disconnect", () => {
+    console.log("cliente desconectado");
+  });
 });
 /* Template Engine */
 app.engine("handlebars", handlebars.engine());
@@ -74,8 +155,10 @@ app.use(express.urlencoded({ extended: true }));
 /* Routes */
 import product_routes from "./routes/product.router.js";
 import cart_routes from "./routes/cart.router.js";
+import message_routes from "./routes/message.router.js";
 app.use("/api/products", product_routes);
 app.use("/api/carts", cart_routes);
+app.use("/api/messages", message_routes);
 // Ruta o método de prueba para el API
 app.get("/datos-autor", (req, res) => {
   console.log("Hola mundo");

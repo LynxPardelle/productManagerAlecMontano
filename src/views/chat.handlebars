@@ -1,0 +1,17 @@
+<p>Te damos la bienvenida al chat</p>
+<div id="chat">
+  <div id="messages"></div>
+  <form id="form" action="">
+    <input id="inputUser" type="text" name="user" /><button
+      id="changeUserButton"
+    >Change user</button>
+    <br />
+    <input
+      id="inputMessage"
+      name="message"
+      autocomplete="off"
+    /><button id="submitButton" disabled="true">Send</button>
+  </form>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js"></script>
