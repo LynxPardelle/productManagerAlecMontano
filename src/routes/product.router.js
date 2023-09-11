@@ -2,10 +2,17 @@ import { productController } from "../dao/product.controller.js";
 import express from "express";
 const router = express.Router();
 router.get("/", async (req, res) => {
-  res.json(await productController.getProducts(req.query.limit));
+  res.json(
+    await productController.getProducts(
+      req.query.limit,
+      req.query.page,
+      req.query.sort,
+      req.query.query
+    )
+  );
 });
 router.get("/:pid", async (req, res) => {
-  res.json(await productController.getProductById(req.params.pid));
+  res.json(await productController.getProductBy_id(req.params.pid));
 });
 router.post("/", async (req, res) => {
   res.json(await productController.addProduct(req.body));

@@ -15,11 +15,14 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/realtimeproducts", (req, res) => {
+router.get("/realtimeproducts" || "products", (req, res) => {
   res.render("home", {
-    user: testUser,
     style: "styles.css",
-    isAdmin: testUser.role === "admin",
+  });
+});
+router.get("/products", (req, res) => {
+  res.render("home", {
+    style: "styles.css",
   });
 });
 

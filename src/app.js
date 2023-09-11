@@ -54,6 +54,18 @@ io.on("connection", (socket) => {
             throw new Error("No se pudo obtener los productos.");
           }
           break;
+        case option.includes("filter:"):
+          let productsFromServerFiltered = await fetch(
+            "http://localhost:8080/api/products/" +
+              option.replace("filter:", "")
+          );
+          if (productsFromServerFiltered.status === 200) {
+            products = await productsFromServerFiltered.json();
+          } else {
+            console.log(productsFromServerFiltered);
+            throw new Error("No se pudo obtener los productos.");
+          }
+          break;
         default:
           break;
       }

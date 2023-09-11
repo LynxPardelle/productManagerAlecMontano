@@ -1,4 +1,5 @@
 import { productModel } from "./models/product.model.js";
+import mongoosePaginate from "mongoose-paginate-v2";
 export const productController = {
   /* Create */
   async addProduct(product) {
@@ -46,15 +47,46 @@ export const productController = {
     }
   },
   /* Read */
-  async getProducts(limit = 0) {
+  async getProducts(limit = 9999, page = 1, sort, query) {
     try {
-      let products = await productModel.find();
+      let filter = !!query && !!isJsonString(query) ? JSON.parse(query) : {};
+      function isJsonString(str) {
+        try {
+          console.log(str);
+          JSON.parse(str);
+        } catch (e) {
+          return false;
+        }
+        return true;
+      }
+      let products = await productModel.paginate(filter, {
+        limit: limit,
+        page: page,
+        sort: ["asc", "desc"].includes(sort) ? { price: sort } : {},
+      });
       if (!products) throw new Error("Error getting products");
       if (products.length === 0) throw new Error("No products found");
       return {
         status: "success",
         message: "Products listed successfully",
-        data: limit !== 0 ? products.slice(0, limit) : products,
+        data: products,
+        payload: products.docs,
+        totalPages: products.totalPages,
+        prevPage: products.prevPage,
+        nextPage: products.nextPage,
+        page: products.page,
+        hasPrevPage: products.hasPrevPage,
+        hasNextPage: products.hasNextPage,
+        prevLink: products.hasPrevPage
+          ? `/products?page=${products.prevPage}&limit=${products.limit}${
+              ["asc", "desc"].includes(sort) ? `&sort=${sort}` : ""
+            }${!!filter ? `&query=${filter}` : ""}`
+          : null,
+        nextLink: products.hasNextPage
+          ? `/products?page=${products.nextPage}&limit=${products.limit}${
+              ["asc", "desc"].includes(sort) ? `&sort=${sort}` : ""
+            }${!!filter ? `&query=${filter}` : ""}`
+          : null,
       };
     } catch (error) {
       console.error(error);

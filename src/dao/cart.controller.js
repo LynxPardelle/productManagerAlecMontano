@@ -1,5 +1,6 @@
 import { cartModel } from "./models/cart.model.js";
 import { productModel } from "./models/product.model.js";
+import mongoosePaginate from "mongoose-paginate-v2";
 export default {
   /* Create */
   async addCart(cart) {
@@ -54,7 +55,7 @@ export default {
   /* Read */
   async getCartById(id) {
     try {
-      let cart = await cartModel.findOn({ _id: id });
+      let cart = await cartModel.findOne({ _id: id });
       if (!cart) throw new Error("Cart not found");
       cart.products = await Promise.all(
         cart.products.map(async (product) => {
@@ -76,6 +77,87 @@ export default {
       return {
         status: "error",
         message: "Error getting cart",
+        error: error.message,
+      };
+    }
+  },
+  /* Update */
+  async updateCart(id, cart) {
+    try {
+      let cartUpdated = await cartModel.updateOne({ _id: id }, cart);
+      if (!cartUpdated) throw new Error("Error updating cart");
+      return {
+        status: "success",
+        message: "Cart updated successfully",
+        data: cart,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Error updating cart",
+        error: error.message,
+      };
+    }
+  },
+  async updateProductFromCart(cid, pid, product) {
+    try {
+      let cart = await cartModel.findOne({ _id: cid });
+      if (!cart) throw new Error("Cart not found");
+      let productFound = await cart.products.find(
+        (product) => product._id === parseInt(pid)
+      );
+      if (!!productFound) {
+        productFound.quantity = product.quantity;
+      } else {
+        throw new Error("Product not found");
+      }
+      let cartUpdated = await cartModel.updateOne({ _id: cid }, cart);
+      if (!cartUpdated) throw new Error("Error updating cart");
+      return {
+        status: "success",
+        message: "Cart updated successfully",
+        data: cart,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Error adding cart to cart",
+        error: error.message,
+      };
+    }
+  },
+  /* Delete */
+  async deleteProductFromCart(cid, pid) {
+    try {
+      let cart = await cartModel.findOne({ _id: cid });
+      if (!cart) throw new Error("Cart not found");
+      let product = await cart.products.find(
+        (product) => product._id === parseInt(pid)
+      );
+      if (!!product) {
+        product.quantity--;
+        if (product.quantity === 0) {
+          cart.products = cart.products.filter(
+            (product) => product._id !== parseInt(pid)
+          );
+        }
+      } else {
+        throw new Error("Product not found");
+      }
+      let cartUpdated = await cartModel.updateOne({ _id: cid }, cart);
+      if (!cartUpdated) throw new Error("Error updating cart");
+      return {
+        status: "success",
+        message: "Cart updated successfully",
+        data: cart,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Error adding cart to cart",
         error: error.message,
       };
     }
