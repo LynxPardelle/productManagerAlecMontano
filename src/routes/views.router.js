@@ -25,6 +25,11 @@ router.get("/products", (req, res) => {
     style: "styles.css",
   });
 });
+router.get("/cart", (req, res) => {
+  res.render("cart", {
+    style: "styles.css",
+  });
+});
 
 router.get("/chat", (req, res) => {
   res.render("chat", {

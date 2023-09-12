@@ -13,7 +13,7 @@ export default {
       return {
         status: "success",
         message: "Cart added successfully",
-        data: newCart,
+        data: cartCreated,
       };
     } catch (error) {
       console.error(error);
@@ -26,18 +26,33 @@ export default {
   },
   async addProductToCart(cid, pid) {
     try {
-      let cart = cartModel.findOne({ _id: cid });
+      let cart = await cartModel.findOne({ _id: cid });
       if (!cart) throw new Error("Cart not found");
-      let product = await cart.products.find(
-        (product) => product._id === parseInt(pid)
-      );
+      console.log(cart.products);
+      console.log(pid);
+      let product = cart.products
+        ? await cart.products.find((product) => {
+            let productId = product._id
+              .toString()
+              .replace(/"/g, "")
+              .replace("new ObjectId(", "")
+              .replace(")", "");
+            return productId === pid;
+          })
+        : null;
       if (!!product) {
         product.quantity++;
       } else {
-        cart.products.push({ _id: parseInt(pid), quantity: 1 });
+        if (cart.products) {
+          cart.products.push({ _id: pid, quantity: 1 });
+        } else {
+          cart.products = [{ _id: pid, quantity: 1 }];
+        }
       }
       let cartUpdated = await cartModel.updateOne({ _id: cid }, cart);
       if (!cartUpdated) throw new Error("Error updating cart");
+      cart = await cartModel.findOne({ _id: cid });
+      if (!cart) throw new Error("Cart not found");
       return {
         status: "success",
         message: "Cart updated successfully",
@@ -59,7 +74,12 @@ export default {
       if (!cart) throw new Error("Cart not found");
       cart.products = await Promise.all(
         cart.products.map(async (product) => {
-          let productFound = await productModel.findOne({ _id: product._id });
+          let productId = product._id
+            .toString()
+            .replace(/"/g, "")
+            .replace("new ObjectId(", "")
+            .replace(")", "");
+          let productFound = await productModel.findOne({ _id: productId });
           console.log(productFound);
           if (!!productFound) {
             product.product = productFound;
@@ -133,15 +153,25 @@ export default {
     try {
       let cart = await cartModel.findOne({ _id: cid });
       if (!cart) throw new Error("Cart not found");
-      let product = await cart.products.find(
-        (product) => product._id === parseInt(pid)
-      );
+      let product = await cart.products.find((product) => {
+        let productId = product._id
+          .toString()
+          .replace(/"/g, "")
+          .replace("new ObjectId(", "")
+          .replace(")", "");
+        return productId === pid;
+      });
       if (!!product) {
         product.quantity--;
         if (product.quantity === 0) {
-          cart.products = cart.products.filter(
-            (product) => product._id !== parseInt(pid)
-          );
+          cart.products = cart.products.filter((product) => {
+            let productId = product._id
+              .toString()
+              .replace(/"/g, "")
+              .replace("new ObjectId(", "")
+              .replace(")", "");
+            return productId !== pid;
+          });
         }
       } else {
         throw new Error("Product not found");
