@@ -1,0 +1,13 @@
+<h2>Datos de
+  {{user.first_name}}
+  {{user.last_name}}</h2>
+
+  <ul>
+    <li>Nombre: {{user.first_name}}</li>
+    <li>Apellidos: {{user.last_name}}</li>
+    <li>Email: {{user.email}}</li>
+    <li>Edad: {{user.age}}</li>
+    {{#if isAdmin }}
+    <li>Rol: {{user.role}}</li>
+    {{/if}}
+  </ul>

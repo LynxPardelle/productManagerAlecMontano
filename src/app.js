@@ -1,22 +1,35 @@
 /* Create express server */
 import express from "express";
-import handlebars from "express-handlebars";
-import __dirname from "./utils.js";
-import viewsRouter from "./routes/views.router.js";
-import { Server } from "socket.io";
+import session from "express-session";
 import mongoose from "mongoose";
+import viewsRouter from "./routes/views.router.js";
+import __dirname from "./dirname.js";
+import MongoStore from "connect-mongo";
+import handlebars from "express-handlebars";
+import { Server } from "socket.io";
 /* Run server */
 const app = express();
 const PORT = 8080;
+const mongoUrl =
+  "mongodb+srv://lnxdrk:Xi7neP4j0Eqyi9cd@productmanagermontano.zazjp31.mongodb.net/?retryWrites=true&w=majority";
 const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-mongoose
-  .connect(
-    "mongodb+srv://lnxdrk:Xi7neP4j0Eqyi9cd@productmanagermontano.zazjp31.mongodb.net/?retryWrites=true&w=majority"
-  )
-  .catch((error) => console.error(error));
-
+mongoose.connect(mongoUrl).catch((error) => console.error(error));
+/* Session */
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: mongoUrl,
+      mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+      ttl: 15,
+    }),
+    /* TODO: Add secret with dot env */
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 /* Socket.io */
 const io = new Server(server);
 io.on("connection", (socket) => {
@@ -164,13 +177,18 @@ server.on("error", (error) => console.log(`Error en servidor ${error}`));
 /* Middleware */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 /* Routes */
 import product_routes from "./routes/product.router.js";
 import cart_routes from "./routes/cart.router.js";
 import message_routes from "./routes/message.router.js";
+import session_routes from "./routes/session.router.js";
+import user_routes from "./routes/user.router.js";
 app.use("/api/products", product_routes);
 app.use("/api/carts", cart_routes);
 app.use("/api/messages", message_routes);
+app.use("/api/sessions", session_routes);
+app.use("/api/users", user_routes);
 // Ruta o método de prueba para el API
 app.get("/datos-autor", (req, res) => {
   console.log("Hola mundo");
