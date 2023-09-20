@@ -7,15 +7,19 @@ import __dirname from "./dirname.js";
 import MongoStore from "connect-mongo";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
+import dotenv from "dotenv";
+import passport from "passport";
+import initializePassport from "./config/passport-config.js";
+dotenv.config();
 /* Run server */
 const app = express();
 const PORT = 8080;
-const mongoUrl =
-  "mongodb+srv://lnxdrk:Xi7neP4j0Eqyi9cd@productmanagermontano.zazjp31.mongodb.net/?retryWrites=true&w=majority";
+const mongoUrl = process.env.MONGO_URL || "";
 const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
 mongoose.connect(mongoUrl).catch((error) => console.error(error));
+initializePassport();
 /* Session */
 app.use(
   session({
@@ -30,6 +34,7 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use(passport.initialize());
 /* Socket.io */
 const io = new Server(server);
 io.on("connection", (socket) => {

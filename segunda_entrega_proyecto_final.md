@@ -1,24 +1,24 @@
-Segunda pre-entrega de tu Proyecto final
+# Segunda pre-entrega de tu Proyecto final
 
 Deberás entregar el proyecto que has venido armando, cambiando persistencia en base de datos, además de agregar algunos endpoints nuevos a tu ecommerce
 
-Objetivos generales
+# Objetivos generales
 
 ✔️ Contarás con Mongo como sistema de persistencia principal
 
 ✔️ Tendrás definidos todos los endpoints para poder trabajar con productos y carritos.
 
-Objetivos específicos
+# Objetivos específicos
 
 ✔️ Profesionalizar las consultas de productos con filtros, paginación y ordenamientos
 
 ✔️ Profesionalizar la gestión de carrito para implementar los últimos conceptos vistos.
 
-Formato
+# Formato
 
 ✔️ Link al repositorio de Github, sin la carpeta de node_modules
 
-Sugerencias
+# Sugerencias
 
 ✔️ Permitir comentarios en el archivo
 
@@ -26,7 +26,7 @@ Sugerencias
 
 ✔️ Los nuevos endpoints deben seguir la misma estructura y lógica que hemos seguido.
 
-Se debe entregar
+# Se debe entregar
 
 ✔️ Con base en nuestra implementación actual de productos, modificar el método GET / para que cumpla con los siguientes puntos:
 ° Deberá poder recibir por query params un limit (opcional), una page (opcional), un sort (opcional) y un query (opcional)

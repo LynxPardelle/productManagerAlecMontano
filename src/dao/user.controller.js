@@ -6,7 +6,7 @@ export const UserController = {
   async getUser(req, res) {
     try {
       const uid = req.params.id;
-      const user = await userModel.findById(uid);
+      const user = await userModel.DoGetUser({ _id: uid });
       if (!user) {
         throw new Error("User not found");
       }
@@ -23,20 +23,20 @@ export const UserController = {
       });
     }
   },
+  async DoGetUser(json) {
+    try {
+      const user = await userModel.findOne(json);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return user;
+    } catch (error) {
+      return error;
+    }
+  },
   async registerUser(req, res) {
     try {
-      let { first_name, last_name, email, age, password } = req.body;
-      /* password = await getHash(password); */
-      if (email === "adminCoder@coder.com")
-        throw new Error("User already exists");
-      const result = await userModel.create({
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-        age: age,
-        password: password,
-        role: email === "adminCoder@coder.com" ? "admin" : "usuario",
-      });
+      const result = await doRegisterUser(req.body);
       if (!result) {
         throw new Error("Error creating user");
       }
@@ -55,6 +55,28 @@ export const UserController = {
       }); */
       req.session.registerFailed = true;
       res.redirect("/register");
+    }
+  },
+  async DoRegisterUser(json) {
+    try {
+      let { first_name, last_name, email, age, password } = json;
+      /* password = await getHash(password); */
+      if (email === "adminCoder@coder.com")
+        throw new Error("User already exists");
+      const result = await userModel.create({
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        age: age,
+        password: password,
+        role: email === "adminCoder@coder.com" ? "admin" : "usuario",
+      });
+      if (!result) {
+        throw new Error("Error creating user");
+      }
+      return result;
+    } catch (error) {
+      return error;
     }
   },
   async login(req, res) {
