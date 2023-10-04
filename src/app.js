@@ -1,5 +1,6 @@
 /* Create express server */
 import express from "express";
+import cookieParser from "cookie-parser";
 import session from "express-session";
 import mongoose from "mongoose";
 import viewsRouter from "./routes/views.router.js";
@@ -182,6 +183,7 @@ server.on("error", (error) => console.log(`Error en servidor ${error}`));
 /* Middleware */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 /* Routes */
 import product_routes from "./routes/product.router.js";
