@@ -38,7 +38,7 @@ router.get(
 router.get("/privado", auth, (req, res) => {
   res.send("Bienvenido a la página privada, " + req.session.user);
 });
-router.get("'current", (req, res) => {
+router.get("/current", (req, res) => {
   res.send(req.session.user);
 });
 export default router;
