@@ -2,24 +2,23 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import mongoose from "mongoose";
 import viewsRouter from "./routes/views.router.js";
 import __dirname from "./dirname.js";
 import MongoStore from "connect-mongo";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
-import dotenv from "dotenv";
 import passport from "passport";
 import initializePassport from "./config/passport-config.js";
-dotenv.config();
+import MongoSingleton, { mongoUrl } from "./config/mongoSingleton.js";
+import { options } from "./config/process.js";
+import cors from "cors";
 /* Run server */
 const app = express();
-const PORT = 8080;
-const mongoUrl = process.env.MONGO_URL || "";
+const PORT = options.port || 8080;
+MongoSingleton.getInstance();
 const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-mongoose.connect(mongoUrl).catch((error) => console.error(error));
 initializePassport();
 /* Session */
 app.use(
@@ -182,6 +181,7 @@ app.use("/", viewsRouter);
 server.on("error", (error) => console.log(`Error en servidor ${error}`));
 /* Middleware */
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
