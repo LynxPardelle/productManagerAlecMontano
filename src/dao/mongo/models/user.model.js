@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import crypto from "crypto";
-import { createHash } from "../../utils/crypts.js";
+import { createHash } from "../../../utils/crypts.js";
 const userSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },

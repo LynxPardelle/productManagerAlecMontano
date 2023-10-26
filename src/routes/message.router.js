@@ -1,10 +1,7 @@
-import messageController from "../dao/message.controller.js";
+import { addMessage, getMessages } from "../controllers/message.controller.js";
 import express from "express";
+import { auth } from "../middleware/auth.middleware.js";
 const router = express.Router();
-router.get("/", async (req, res) => {
-  res.json(await messageController.getMessages(req.query.limit));
-});
-router.post("/", async (req, res) => {
-  res.json(await messageController.addMessage(req.body));
-});
+router.get("/", getMessages);
+router.post("/", auth, addMessage);
 export default router;

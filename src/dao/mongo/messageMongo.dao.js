@@ -1,5 +1,4 @@
 import Message from "./models/message.model.js";
-import mongoosePaginate from "mongoose-paginate-v2";
 export default {
   /* Create */
   async addMessage(message) {

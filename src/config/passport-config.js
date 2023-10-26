@@ -1,7 +1,7 @@
 import passport from "passport";
 import GitHubStrategy from "passport-github2";
-import { UserController } from "../dao/user.controller.js";
 import config from "./config.js";
+import userMongoDao from "../dao/mongo/userMongo.dao.js";
 
 export default () => {
   passport.use(
@@ -14,7 +14,7 @@ export default () => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          let user = await UserController.DoGetUser({
+          let user = await userMongoDao.DoGetUser({
             email: profile._json.email || profile._json.html_url,
           });
           if (!user.email) {
@@ -25,7 +25,7 @@ export default () => {
               email: profile._json.email || profile._json.html_url,
               password: profile._json.name,
             };
-            let result = await UserController.DoRegisterUser(newUser);
+            let result = await userMongoDao.registerUser(newUser);
             if (!result) {
               throw new Error("Error creating user");
             }
@@ -44,7 +44,7 @@ export default () => {
   });
   passport.deserializeUser(async (user, done) => {
     try {
-      let userFromServer = await UserController.getUser(user.id);
+      let userFromServer = await userMongoDao.getUser(user.id);
       done(null, userFromServer);
     } catch (error) {
       done(error, null);

@@ -127,6 +127,7 @@ class ProductManager {
       };
     }
   }
+  /* Update */
   async updateProduct(id, product2Update) {
     try {
       let fileReaded = await this.readFile();
@@ -160,6 +161,7 @@ class ProductManager {
       };
     }
   }
+  /* Delete */
   async deleteProduct(id) {
     try {
       let fileReaded = await this.readFile();

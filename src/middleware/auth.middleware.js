@@ -1,11 +1,15 @@
 import passport from "passport";
 export function auth(req, res, next) {
-  const { username, password } = req.query;
-  if (username !== "admin" && password !== "1234") {
+  if (!req.session.user) {
     return res.status(401).send("Unauthorized");
   }
-  req.session.user = username;
-  req.session.admin = true;
+  next();
+}
+
+export function authAdmin(req, res, next) {
+  if (!req.session.user || req.session.user.role !== "admin") {
+    return res.status(401).send("Unauthorized");
+  }
   next();
 }
 

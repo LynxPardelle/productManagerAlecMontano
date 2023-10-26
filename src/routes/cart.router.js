@@ -1,36 +1,24 @@
-import cartController from "../dao/cart.controller.js";
 import express from "express";
+import {
+  addCart,
+  addProductToCart,
+  deleteProductFromCart,
+  getCartById,
+  purchaseCart,
+  updateCart,
+  updateProductFromCart,
+} from "../controllers/cart.controller.js";
+import { auth } from "../middleware/auth.middleware.js";
 const router = express.Router();
 /* Create */
-router.post("/", async (req, res) => {
-  res.json(await cartController.addCart(req.body));
-});
-router.post("/:cid/product/:pid", async (req, res) => {
-  res.json(
-    await cartController.addProductToCart(req.params.cid, req.params.pid)
-  );
-});
+router.post("/", auth, addCart);
+router.post("/:cid/product/:pid", auth, addProductToCart);
 /* Read */
-router.get("/:cid", async (req, res) => {
-  res.json(await cartController.getCartById(req.params.cid));
-});
+router.get("/:cid", getCartById);
 /* Update */
-router.put("/:cid", async (req, res) => {
-  res.json(await cartController.updateCart(req.params.cid, req.body));
-});
-router.put("/:cid/product/:pid", async (req, res) => {
-  res.json(
-    await cartController.updateProductFromCart(
-      req.params.cid,
-      req.params.pid,
-      req.body
-    )
-  );
-});
+router.put("/:cid", auth, updateCart);
+router.put("/:cid/product/:pid", auth, updateProductFromCart);
+router.put("/:cid/purchase", auth, purchaseCart);
 /* Delete */
-router.delete("/:cid/product/:pid", async (req, res) => {
-  res.json(
-    await cartController.deleteProductFromCart(req.params.cid, req.params.pid)
-  );
-});
+router.delete("/:cid/product/:pid", auth, deleteProductFromCart);
 export default router;

@@ -13,4 +13,5 @@ export default {
   gitHubClientId: process.env.GITHUB_CLIENT_ID,
   mongoUrl: process.env.MONGO_URL || "",
   port: process.env.PORT || 8080,
+  persistence: process.env.PERSISTENCE || "MONGO",
 };

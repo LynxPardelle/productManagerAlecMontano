@@ -1,6 +1,6 @@
 import { cartModel } from "./models/cart.model.js";
 import { productModel } from "./models/product.model.js";
-import mongoosePaginate from "mongoose-paginate-v2";
+import { ticketModel } from "./models/ticket.model.js";
 export default {
   /* Create */
   async addCart(cart) {
@@ -28,8 +28,6 @@ export default {
     try {
       let cart = await cartModel.findOne({ _id: cid });
       if (!cart) throw new Error("Cart not found");
-      console.log(cart.products);
-      console.log(pid);
       let product = cart.products
         ? await cart.products.find((product) => {
             let productId = product._id
@@ -80,7 +78,6 @@ export default {
             .replace("new ObjectId(", "")
             .replace(")", "");
           let productFound = await productModel.findOne({ _id: productId });
-          console.log(productFound);
           if (!!productFound) {
             product.product = productFound;
           }
@@ -148,6 +145,73 @@ export default {
       };
     }
   },
+  async purchaseCart(id, email) {
+    try {
+      let cart = await cartModel.findOne({ _id: id });
+      if (!cart) throw new Error("Cart not found");
+      cart.products = await Promise.all(
+        cart.products.map(async (product) => {
+          let productId = product._id
+            .toString()
+            .replace(/"/g, "")
+            .replace("new ObjectId(", "")
+            .replace(")", "");
+          let productFound = await productModel.findOne({ _id: productId });
+          if (!!productFound) {
+            product.product = productFound;
+          }
+          return product;
+        })
+      );
+      const notPurchasedProducts = cart.products.filter((product) => {
+        return product.product.stock < product.quantity;
+      });
+      let amount = 0;
+      cart.products = await Promise.all(
+        cart.products.map(async (product) => {
+          if (product.product.stock >= product.quantity) {
+            product.product.stock -= product.quantity;
+            await productModel.updateOne(
+              { _id: product.product._id },
+              product.product
+            );
+            amount += product.product.price * product.quantity;
+            product.quantity = 0;
+            return product;
+          } else {
+            return product;
+          }
+        })
+      );
+      cart.products = cart.products.filter((product) => {
+        return product.quantity !== 0;
+      });
+      let cartUpdated = await cartModel.updateOne({ _id: id }, cart);
+      if (!cartUpdated) throw new Error("Error updating cart");
+      let ticket = await ticketModel.create({
+        code: await getRandomCode(),
+        purchase_datetime: new Date(),
+        amount: amount,
+        purchaser: email,
+      });
+      if (!ticket) throw new Error("Error creating ticket");
+      return {
+        status: "success",
+        message: "Cart purchased successfully",
+        data: {
+          cart: cartUpdated,
+          ticket: ticket,
+          notPurchasedProducts,
+        },
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        message: "Error purchasing the cart",
+        error: error.message,
+      };
+    }
+  },
   /* Delete */
   async deleteProductFromCart(cid, pid) {
     try {
@@ -193,3 +257,21 @@ export default {
     }
   },
 };
+async function getRandomCode() {
+  try {
+    let code = Math.floor(Math.random() * 1000000);
+    let ticket = await ticketModel.findOne({ code: code });
+    if (!!ticket) {
+      return await getRandomCode();
+    } else {
+      return code;
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      message: "Error getting random code",
+      error: error.message,
+    };
+  }
+}

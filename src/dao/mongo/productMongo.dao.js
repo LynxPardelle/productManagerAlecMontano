@@ -1,6 +1,5 @@
 import { productModel } from "./models/product.model.js";
-import mongoosePaginate from "mongoose-paginate-v2";
-export const productController = {
+export default {
   /* Create */
   async addProduct(product) {
     try {
@@ -13,7 +12,6 @@ export const productController = {
         !product.category
       )
         throw new Error("Missing data");
-      console.log("productPreCodeChecker", product);
       let codeChecker = await getRandomCode(product.code);
       if (codeChecker !== product.code) throw new Error("Code already exists");
       let newProduct = {
@@ -26,12 +24,10 @@ export const productController = {
         status: product.status || true,
         category: product.category,
       };
-      console.log("productPreCreate", newProduct);
       let BDproduct = productModel.create(newProduct);
       if (!BDproduct) {
         throw new Error("Error adding product to BD");
       }
-      console.log("BDproduct", BDproduct);
       return {
         status: "success",
         message: "Product added successfully",
@@ -52,7 +48,6 @@ export const productController = {
       let filter = !!query && !!isJsonString(query) ? JSON.parse(query) : {};
       function isJsonString(str) {
         try {
-          console.log(str);
           JSON.parse(str);
         } catch (e) {
           return false;
@@ -97,7 +92,7 @@ export const productController = {
       };
     }
   },
-  async getProductBy_id(_id) {
+  async getProductById(_id) {
     try {
       let product = await productModel.find({ _id: _id });
       if (!product) throw new Error("Product not found");
@@ -115,6 +110,7 @@ export const productController = {
       };
     }
   },
+  /* Update */
   async updateProduct(_id, product2Update) {
     try {
       let product = productModel.findOne({ _id: parseInt(_id) });
@@ -145,6 +141,7 @@ export const productController = {
       };
     }
   },
+  /* Delete */
   async deleteProduct(_id) {
     try {
       let product = productModel.findOne({ _id: parseInt(_id) });
@@ -188,7 +185,7 @@ async function getRandomCode(code = "") {
   }
 }
 /* Create 10 products for testing */
-setTimeout(() => {
+/* setTimeout(() => {
   (async () => {
     let products = await productController.getProducts();
     if (!products || !products.data || products?.data?.length < 10) {
@@ -207,4 +204,4 @@ setTimeout(() => {
       }
     }
   })();
-}, 1000);
+}, 1000); */

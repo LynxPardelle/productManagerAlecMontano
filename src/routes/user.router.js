@@ -1,8 +1,12 @@
 import express from "express";
-import { UserController } from "../dao/user.controller.js";
+import {
+  getUser,
+  login,
+  registerUser,
+} from "../controllers/user.controller.js";
 const router = express.Router();
-router.post("/register", UserController.registerUser);
-router.post("/login", UserController.login);
-router.get("/user/:id", UserController.getUser);
+router.post("/register", registerUser);
+router.post("/login", login);
+router.get("/user/:id", getUser);
 
 export default router;
