@@ -12,6 +12,7 @@ import initializePassport from "./config/passport-config.js";
 import MongoSingleton, { mongoUrl } from "./config/mongoSingleton.js";
 import { options } from "./config/process.js";
 import cors from "cors";
+import errorHandler from "./middlewares/errors/index.js";
 /* Run server */
 const app = express();
 const PORT = options.port || 8080;
@@ -35,6 +36,7 @@ app.use(
   })
 );
 app.use(passport.initialize());
+app.use(errorHandler);
 /* Socket.io */
 const io = new Server(server);
 io.on("connection", (socket) => {

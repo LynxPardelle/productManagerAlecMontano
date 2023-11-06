@@ -18,6 +18,7 @@
   "author": "Lynx Pardelle",
   "license": "MIT",
   "dependencies": {
+    "@faker-js/faker": "^8.2.0",
     "bcrypt": "^5.1.1",
     "commander": "^11.0.0",
     "connect-mongo": "^5.0.0",

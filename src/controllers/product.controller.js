@@ -1,18 +1,44 @@
 import { _productService } from "../repositories/index.repository.js";
+import { generateProduct } from "../utils/fakerUtil.js";
+import CustomError from "../services/errors/customError.js";
+import { generateConsultErrorInfo } from "../services/errors/info.js";
 
 /* Create */
 export const addProduct = async (req, res) => {
+  let nError = 500;
   try {
-    const product = await _productService.addProduct(req.body);
-    if (!product?.data)
-      return res.status(400).send({
-        status: "error",
-        message: "Error creating product",
-        error: product?.error || product,
+    const product = req.body;
+    if (
+      !product.title ||
+      !product.description ||
+      !product.price ||
+      typeof product.price !== "number" ||
+      !product.stock ||
+      typeof product.stock !== "number" ||
+      !product.code ||
+      !product.category
+    ) {
+      nError = 400;
+      CustomError.createError({
+        name: "Missing data",
+        cause: generateProductErrorInfo(product),
+        message: "Error adding product",
+        code: ErrorCodes.INVALID_PARAM,
       });
-    res.status(201).json(product);
+    }
+    const newProduct = await _productService.addProduct(req.body);
+    if (!newProduct?.data) {
+      nError = 404;
+      CustomError.createError({
+        name: "Product not created",
+        cause: generateNoProductErrorInfo(newProduct),
+        message: "Error creating product",
+        code: ErrorCodes.DATABASE_ERROR,
+      });
+    }
+    res.status(201).json(newProduct);
   } catch (error) {
-    res.status(500).send({
+    res.status(nError).send({
       status: "error",
       message: "Error creating product",
       error: error.message.replace(/"/g, "'"),
@@ -21,6 +47,7 @@ export const addProduct = async (req, res) => {
 };
 /* Read */
 export const getProducts = async (req, res) => {
+  let nError = 500;
   try {
     const products = await _productService.getProducts(
       req.query.limit,
@@ -28,13 +55,68 @@ export const getProducts = async (req, res) => {
       req.query.sort,
       req.query.query
     );
-    if (!products?.data)
-      return res.status(404).send({
-        status: "error",
-        message: "Products not found",
-        error: products?.error || products,
+    if (!products?.data) {
+      nError = 404;
+      CustomError.createError({
+        name: "Products not found",
+        cause: generateNoProductsErrorInfo(products),
+        message: "Error retrieving products",
+        code: ErrorCodes.DATABASE_ERROR,
       });
+    }
     res.status(200).json(products);
+  } catch (error) {
+    res.status(nError).send({
+      status: "error",
+      message: "Error retrieving products",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
+};
+export const getProductById = async (req, res) => {
+  let nError = 500;
+  try {
+    const pid = parseInt(req.params.pid);
+    if (isNaN(pid) || pid < 0) {
+      nError = 400;
+      CustomError.createError({
+        name: "Invalid Params",
+        cause: generateConsultErrorInfo(req.params.pid),
+        message: "Error to get product by ID",
+        code: ErrorCodes.INVALID_TYPES_ERROR,
+      });
+    }
+    const product = await _productService.getProductById(pid);
+    if (!product?.data) {
+      nError = 404;
+      CustomError.createError({
+        name: "Product not found",
+        cause: generateNoProductErrorInfo(product),
+        message: "Error to get product",
+        code: ErrorCodes.DATABASE_ERROR,
+      });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(nError).send({
+      status: "error",
+      message: "Error retrieving product",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
+};
+export const getMockedProducts = async (req, res) => {
+  let nError = 500;
+  try {
+    const products = [];
+    const numberOfProducts = req.query.limit || 100;
+    for (let i = 0; i < numberOfProducts; i++) {
+      products.push(generateProduct());
+    }
+    res.status(200).send({
+      status: "success",
+      payload: { data: products },
+    });
   } catch (error) {
     res.status(500).send({
       status: "error",
@@ -43,40 +125,52 @@ export const getProducts = async (req, res) => {
     });
   }
 };
-export const getProductById = async (req, res) => {
-  try {
-    const product = await _productService.getProductById(req.params.pid);
-    if (!product?.data)
-      return res.status(404).send({
-        status: "error",
-        message: "Product not found",
-        error: product?.error || product,
-      });
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).send({
-      status: "error",
-      message: "Error retrieving product",
-      error: error.message.replace(/"/g, "'"),
-    });
-  }
-};
 /* Update */
 export const updateProduct = async (req, res) => {
+  let nError = 500;
   try {
-    const product = await _productService.updateProduct(
-      req.params.pid,
-      req.body
-    );
-    if (!product?.data)
-      return res.status(400).send({
-        status: "error",
-        message: "Error updating product",
-        error: product?.error || product,
+    const pid = parseInt(req.params.pid);
+    if (isNaN(pid) || pid < 0) {
+      nError = 400;
+      CustomError.createError({
+        name: "Invalid Params",
+        cause: generateConsultErrorInfo(req.params.pid),
+        message: "Error to get product by ID",
+        code: ErrorCodes.INVALID_TYPES_ERROR,
       });
-    res.status(200).json(product);
+    }
+    const product = req.body;
+    if (
+      !product.title ||
+      !product.description ||
+      !product.price ||
+      typeof product.price !== "number" ||
+      !product.stock ||
+      typeof product.stock !== "number" ||
+      !product.code ||
+      !product.category
+    ) {
+      nError = 400;
+      CustomError.createError({
+        name: "Missing data",
+        cause: generateProductErrorInfo(product),
+        message: "Error updating product",
+        code: ErrorCodes.INVALID_PARAM,
+      });
+    }
+    const updatedProduct = await _productService.updateProduct(pid, product);
+    if (!updatedProduct?.data) {
+      nError = 404;
+      CustomError.createError({
+        name: "Product not found",
+        cause: generateNoProductErrorInfo(updatedProduct),
+        message: "Error updating product",
+        code: ErrorCodes.DATABASE_ERROR,
+      });
+    }
+    res.status(200).json(updatedProduct);
   } catch (error) {
-    res.status(500).send({
+    res.status(nError).send({
       status: "error",
       message: "Error updating product",
       error: error.message.replace(/"/g, "'"),
@@ -85,17 +179,31 @@ export const updateProduct = async (req, res) => {
 };
 /* Delete */
 export const deleteProduct = async (req, res) => {
+  let nError = 500;
   try {
-    const product = await _productService.deleteProduct(req.params.pid);
-    if (!product?.data)
-      return res.status(400).send({
-        status: "error",
-        message: "Error deleting product",
-        error: product?.error || product,
+    const pid = parseInt(req.params.pid);
+    if (isNaN(pid) || pid < 0) {
+      nError = 400;
+      CustomError.createError({
+        name: "Invalid Params",
+        cause: generateConsultErrorInfo(req.params.pid),
+        message: "Error to get product by ID",
+        code: ErrorCodes.INVALID_TYPES_ERROR,
       });
+    }
+    const product = await _productService.deleteProduct(pid);
+    if (!product?.data) {
+      nError = 404;
+      CustomError.createError({
+        name: "Product not found",
+        cause: generateNoProductErrorInfo(product),
+        message: "Error deleting product",
+        code: ErrorCodes.DATABASE_ERROR,
+      });
+    }
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).send({
+    res.status(nError).send({
       status: "error",
       message: "Error deleting product",
       error: error.message.replace(/"/g, "'"),
