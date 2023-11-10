@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.plugin(mongoosePaginate);
 userSchema.pre("save", function (next) {
-  // console.log(this);
+  // req.logger.debug(this);
   this.password = createHash(this.password);
   next();
 });

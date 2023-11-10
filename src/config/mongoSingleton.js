@@ -5,16 +5,13 @@ export default class MongoSingleton {
   static #instance;
   constructor() {
     mongoose
-      .connect(mongoUrl, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
+      .connect(mongoUrl)
       .catch((error) => console.error("MongoDB connection failed.", error));
   }
   static getInstance() {
     if (!this.#instance) {
       this.#instance = new MongoSingleton();
-      console.log("MongoDB connected successfully.");
+      console.info("MongoDB connected successfully.");
     }
     return this.#instance;
   }

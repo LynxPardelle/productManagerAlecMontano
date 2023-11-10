@@ -12,13 +12,14 @@ import initializePassport from "./config/passport-config.js";
 import MongoSingleton, { mongoUrl } from "./config/mongoSingleton.js";
 import { options } from "./config/process.js";
 import cors from "cors";
-import errorHandler from "./middlewares/errors/index.js";
+import errorHandler from "./middleware/errors/index.js";
+import { addLogger } from "./utils/loggerCustom.js";
 /* Run server */
 const app = express();
 const PORT = options.port || 8080;
 MongoSingleton.getInstance();
 const server = app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.info(`Server listening on port ${PORT}`);
 });
 initializePassport();
 /* Session */
@@ -26,7 +27,6 @@ app.use(
   session({
     store: MongoStore.create({
       mongoUrl: mongoUrl,
-      mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
       ttl: 15,
     }),
     /* TODO: Add secret with dot env */
@@ -37,12 +37,13 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(errorHandler);
+app.use(addLogger);
 /* Socket.io */
 const io = new Server(server);
 io.on("connection", (socket) => {
-  console.log("cliente conectado");
+  console.info("cliente conectado");
   socket.on("disconnect", () => {
-    console.log("cliente desconectado");
+    console.info("cliente desconectado");
   });
   socket.on("message", (data) => {
     console.log(data);
@@ -168,10 +169,10 @@ io.on("connection", (socket) => {
     }
   });
   socket.on("error", (error) => {
-    console.log(error);
+    console.error(error);
   });
   socket.on("disconnect", () => {
-    console.log("cliente desconectado");
+    console.info("cliente desconectado");
   });
 });
 /* Template Engine */
@@ -180,7 +181,7 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static(__dirname + "/public"));
 app.use("/", viewsRouter);
-server.on("error", (error) => console.log(`Error en servidor ${error}`));
+server.on("error", (error) => console.error(`Error en servidor ${error}`));
 /* Middleware */
 app.use(express.json());
 app.use(cors());
@@ -200,9 +201,20 @@ app.use("/api/sessions", session_routes);
 app.use("/api/users", user_routes);
 // Ruta o método de prueba para el API
 app.get("/datos-autor", (req, res) => {
-  console.log("Hola mundo");
+  req.logger.info("Hola mundo");
   return res.status(200).send({
     autor: "Lynx Pardelle",
     url: "https://www.lynxpardelle.com",
+  });
+});
+app.get("/loggerTest", (req, res) => {
+  req.logger.debug("Debug");
+  req.logger.http("Http");
+  req.logger.info("Information");
+  req.logger.warning("Alerta!!");
+  req.logger.error("Error!!!", { message: "Error!!!" });
+  req.logger.fatal("X.x!!!", { message: "Fatal!!!" });
+  res.send({
+    message: "¡Prueba Logger!",
   });
 });

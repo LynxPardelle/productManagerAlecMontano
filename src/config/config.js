@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { options } from "./process.js";
-console.log("Options", options);
+console.info("Options", options);
 const environment = !!options.dev ? "development" : "production";
 dotenv.config(
   environment === "development"
