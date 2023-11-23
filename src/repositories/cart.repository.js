@@ -13,9 +13,9 @@ export default class CartRepository {
       return { error: error.message };
     }
   }
-  async addProductToCart(cartId, productId) {
+  async addProductToCart(cartId, productId, userId) {
     try {
-      return await this.dao.addProductToCart(cartId, productId);
+      return await this.dao.addProductToCart(cartId, productId, userId);
     } catch (error) {
       return { error: error.message };
     }

@@ -13,6 +13,16 @@ export function authAdmin(req, res, next) {
   next();
 }
 
+export function authPremium(req, res, next) {
+  if (
+    !req.session.user ||
+    (req.session.user.role !== "admin" && req.session.user.role !== "premium")
+  ) {
+    return res.status(401).send("Unauthorized");
+  }
+  next();
+}
+
 export const passportCall = (strategy) => {
   return async (req, res, next) => {
     passport.authenticate(strategy, function (err, user, info) {

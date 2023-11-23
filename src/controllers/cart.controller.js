@@ -23,7 +23,8 @@ export const addProductToCart = async (req, res) => {
   try {
     const cart = await _cartService.addProductToCart(
       req.params.cid,
-      req.params.pid
+      req.params.pid,
+      req.session.user._id
     );
     if (!cart?.data)
       return res.status(400).send({

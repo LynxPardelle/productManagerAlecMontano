@@ -28,4 +28,27 @@ export default class UserRepository {
       return { error: error.message };
     }
   }
+  /* Recovery */
+  async recoveryPassword(email) {
+    try {
+      return await this.dao.recoveryPassword(email);
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+  async resetPassword(token, password, email) {
+    try {
+      return await this.dao.resetPassword(token, password, email);
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+  /* Privileges */
+  async changeRoleUser(id, role) {
+    try {
+      return await this.dao.changeRoleUser(id, role);
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
 }

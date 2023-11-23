@@ -1,0 +1,26 @@
+<main>
+  <form method="post" action="/api/users/reset?token={{token}}">
+    <label for="email">Correo Electrónico</label>
+    <input type="email" name="email" id="email" />
+    <br />
+    <label for="password">Nueva Contraseña</label>
+    <input type="password" name="password" id="password" />
+    <br />
+    <label for="confirmPassword">Confirmar Contraseña</label>
+    <input type="password" name="confirmPassword" id="confirmPassword" />
+    <br />
+    <button type="submit">Cambiar contraseña</button>
+  </form>
+  <a href="/login">Iniciar sesión</a>
+  <br />
+  <a href="/api/sessions/github">Entrar con Github</a>
+</main>{{#if resetFailed}}
+  <p>
+    Reset Failed!
+    <br />
+    {{resetFailedCause}}
+  </p>
+  <script type="text/javascript">
+    alert(`Reset Failed! ${resetFailedCause}`);
+  </script>
+{{/if}}

@@ -5,10 +5,10 @@ export default class ProductRepository {
     this.dao = dao;
   }
   /* Create */
-  async addProduct(product) {
+  async addProduct(product, user) {
     try {
       const newProduct = new ProductDTO(product);
-      return await this.dao.addProduct(newProduct);
+      return await this.dao.addProduct(newProduct, user);
     } catch (error) {
       return { error: error.message };
     }
@@ -29,18 +29,18 @@ export default class ProductRepository {
     }
   }
   /* Update */
-  async updateProduct(id, product) {
+  async updateProduct(id, product, user) {
     try {
       const productUpdated = new ProductDTO(product);
-      return await this.dao.updateProduct(id, productUpdated);
+      return await this.dao.updateProduct(id, productUpdated, user);
     } catch (error) {
       return { error: error.message };
     }
   }
   /* Delete */
-  async deleteProduct(id) {
+  async deleteProduct(id, user) {
     try {
-      return await this.dao.deleteProduct(id);
+      return await this.dao.deleteProduct(id, user);
     } catch (error) {
       return { error: error.message };
     }

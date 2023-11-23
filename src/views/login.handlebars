@@ -11,6 +11,8 @@
   <a href="/register">Regístrate</a>
   <br />
   <a href="/api/sessions/github">Entrar con Github</a>
+  <br />
+  <a href="/recovery">Recuperación de contraseña</a>
 </main>{{#if loginFailed}}
   <script type="text/javascript">
     alert('Login Failed!');
@@ -20,5 +22,17 @@
 {{#if registerSuccess}}
   <script type="text/javascript">
     alert('Register Success!');
+  </script>
+{{/if}}
+
+{{#if recoverySuccess}}
+  <script type="text/javascript">
+    alert('Recovery Success!');
+  </script>
+{{/if}}
+
+{{#if resetSuccess}}
+  <script type="text/javascript">
+    alert('Reset Success!');
   </script>
 {{/if}}

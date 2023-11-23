@@ -14,4 +14,8 @@ export default {
   mongoUrl: process.env.MONGO_URL || "",
   port: process.env.PORT || 8080,
   persistence: process.env.PERSISTENCE || "MONGO",
+  email: process.env.EMAIL_USER,
+  emailMask: process.env.EMAIL_MASK,
+  emailPass: process.env.EMAIL_PASS,
+  secret: process.env.SECRET_KEY,
 };

@@ -4,6 +4,7 @@ export default class UserDTO {
     this.first_name = user.first_name ?? "Unknow";
     this.last_name = user.last_name ?? "Unknow";
     this.email = user.email ?? "Unknow";
+    this.age = user.age ?? 0;
     this.password = user.password ?? "Unknow";
     this.role = user.role ?? "Unknow";
   }

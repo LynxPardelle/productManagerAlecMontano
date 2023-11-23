@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   age: { type: Number, required: true },
   password: { type: String, required: true },
-  role: { type: String, required: true, enum: ["admin", "usuario"] },
+  role: { type: String, required: true, enum: ["admin", "usuario", "premium"] },
 });
 userSchema.plugin(mongoosePaginate);
 userSchema.pre("save", function (next) {

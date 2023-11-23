@@ -1,0 +1,22 @@
+<main>
+  <form method="post" action="/api/users/recovery">
+    <label for="email">Correo Electrónico</label>
+    <input type="email" name="email" id="email" />
+    <br />
+    <button type="submit">Recuperar contraseña</button>
+  </form>
+  <a href="/login">Regresar a iniciar sesión</a>
+  <br />
+  <a href="/api/sessions/github">Entrar con Github</a>
+</main>
+{{#if recoveryFailed}}
+  <script type="text/javascript">
+    alert(`Recovery Failed! ${{{recoveryFailedCause}}}`);
+  </script>
+{{/if}}
+
+{{#if resetFailed}}
+  <script type="text/javascript">
+    alert(`Reset Failed! ${{{resetFailedCause}}}`);
+  </script>
+{{/if}}

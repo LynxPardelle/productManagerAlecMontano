@@ -7,12 +7,30 @@ router.get("/", auth, (req, res) => {
     style: "styles.css",
   });
 });
-
 router.get("/login", logged, (req, res) => {
   res.render("login", {
     style: "styles.css",
     loginFailed: req.session?.loginFailed ?? false,
     registerSuccess: req.session?.registerSuccess ?? false,
+    recoverySuccess: req.session?.recoverySuccess ?? false,
+    resetSuccess: req.session?.resetSuccess ?? false,
+  });
+});
+router.get("/recovery", logged, (req, res) => {
+  res.render("recovery", {
+    style: "styles.css",
+    recoveryFailed: req.session?.recoveryFailed ?? false,
+    recoveryFailedCause: req.session?.recoveryFailedCause ?? "",
+    resetFailed: req.session?.resetFailed ?? false,
+    resetFailedCause: req.session?.resetFailedCause ?? "",
+  });
+});
+router.get("/reset", logged, (req, res) => {
+  res.render("reset", {
+    style: "styles.css",
+    token: req.query.token,
+    resetFailed: req.session?.resetFailed ?? false,
+    resetFailedCause: req.session?.resetFailedCause ?? "",
   });
 });
 router.get("/register", logged, (req, res) => {

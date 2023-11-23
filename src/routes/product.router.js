@@ -7,12 +7,12 @@ import {
   getProducts,
   updateProduct,
 } from "../controllers/product.controller.js";
-import { authAdmin } from "../middleware/auth.middleware.js";
+import { authPremium } from "../middleware/auth.middleware.js";
 const router = express.Router();
 router.get("/", getProducts);
 router.get("/mockingproducts’", getMockedProducts);
 router.get("/:pid", getProductById);
-router.post("/", authAdmin, addProduct);
-router.put("/:id", authAdmin, updateProduct);
-router.delete("/:id", authAdmin, deleteProduct);
+router.post("/", authPremium, addProduct);
+router.put("/:id", authPremium, updateProduct);
+router.delete("/:id", authPremium, deleteProduct);
 export default router;

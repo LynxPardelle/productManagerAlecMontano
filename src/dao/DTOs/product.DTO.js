@@ -6,5 +6,6 @@ export default class ProductDTO {
     this.code = product.code ?? "Unknow";
     this.stock = product.stock ?? 0;
     this.image = product.image ?? "Unknow";
+    this.owner = product.owner ?? "Unknow";
   }
 }

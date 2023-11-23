@@ -21,7 +21,7 @@ export const addProduct = async (req, res) => {
       nError = 400;
       CustomError.createError({
         name: "Missing data",
-        cause: generateProductErrorInfo(product),
+        cause: generateProductErrorInfo(product, req.session.user),
         message: "Error adding product",
         code: ErrorCodes.INVALID_PARAM,
       });
@@ -158,7 +158,11 @@ export const updateProduct = async (req, res) => {
         code: ErrorCodes.INVALID_PARAM,
       });
     }
-    const updatedProduct = await _productService.updateProduct(pid, product);
+    const updatedProduct = await _productService.updateProduct(
+      pid,
+      product,
+      req.session.user
+    );
     if (!updatedProduct?.data) {
       nError = 404;
       CustomError.createError({
@@ -191,7 +195,7 @@ export const deleteProduct = async (req, res) => {
         code: ErrorCodes.INVALID_TYPES_ERROR,
       });
     }
-    const product = await _productService.deleteProduct(pid);
+    const product = await _productService.deleteProduct(pid, req.session.user);
     if (!product?.data) {
       nError = 404;
       CustomError.createError({

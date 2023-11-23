@@ -1,7 +1,7 @@
 import { productModel } from "./models/product.model.js";
 export default {
   /* Create */
-  async addProduct(product) {
+  async addProduct(product, user) {
     try {
       if (
         !product.title ||
@@ -23,6 +23,10 @@ export default {
         stock: product.stock,
         status: product.status || true,
         category: product.category,
+        owner:
+          product.owner ||
+          (["admin", "premium"].includes(user.role) ? user._id : undefined) ||
+          "admin",
       };
       let BDproduct = productModel.create(newProduct);
       if (!BDproduct) {
@@ -111,10 +115,15 @@ export default {
     }
   },
   /* Update */
-  async updateProduct(_id, product2Update) {
+  async updateProduct(_id, product2Update, user) {
     try {
       let product = productModel.findOne({ _id: parseInt(_id) });
       if (!product) throw new Error("Product not found");
+      if (
+        !["admin", "premium"].includes(user.role) ||
+        (user.role === "premium" && user._id !== product.owner)
+      )
+        throw new Error("You don't have permission to update this product");
       product.title = product2Update.title;
       product.description = product2Update.description;
       product.price = product2Update.price;
@@ -122,6 +131,7 @@ export default {
       product.stock = product2Update.stock;
       product.status = product2Update.status;
       product.category = product2Update.category;
+      product.owner = product2Update.owner || "admin";
       let updatedProduct = await productModel.updateOne(
         { _id: product._id },
         product
@@ -142,10 +152,15 @@ export default {
     }
   },
   /* Delete */
-  async deleteProduct(_id) {
+  async deleteProduct(_id, user) {
     try {
       let product = productModel.findOne({ _id: parseInt(_id) });
       if (!product) throw new Error("Product not found");
+      if (
+        !["admin", "premium"].includes(user.role) ||
+        (user.role === "premium" && user._id !== product.owner)
+      )
+        throw new Error("You don't have permission to update this product");
       let productDeleter = await productModel.deleteOne({ _id: product._id });
       if (!productDeleter) throw new Error("Error deleting product");
       return {
