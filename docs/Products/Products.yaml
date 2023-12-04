@@ -1,0 +1,200 @@
+paths:
+  /api/products:
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Product"
+      responses:
+        200:
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Product"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Products
+      responses:
+        200:
+          description: Los productos fueron obtenidos satisfactoriamente de la base de datos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Product"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+  /api/products/{pid}:
+    get:
+      summary: Obtiene un solo producto por su ID
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            $type: String
+      responses:
+        200:
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Product"
+    put:
+      summary: Actualizar un producto por su ID
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateProduct"
+      responses:
+        200:
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Product"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+    delete:
+      summary: Eliminar un producto por su ID
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            $type: String
+      responses:
+        200:
+          description: Producto eliminado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Product"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+  /api/products/mockingproducts:
+    get:
+      summary: Obtiene todos los productos mockeados
+      tags:
+        - Products
+      responses:
+        200:
+          description: Los productos fueron obtenidos satisfactoriamente de la base de datos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Product"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del producto autogenerado por MongoDB
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        thumbnail:
+          type: string
+          description: Imagen del producto
+        code:
+          type: string
+          description: Código del producto
+        stock:
+          type: number
+          description: Stock del producto
+        status:
+          type: string
+          description: Estado del producto
+        category:
+          type: string
+          description: Categoría del producto
+        owner:
+          type: string
+          description: ID del usuario que creó el producto
+      required:
+        - title
+        - description
+        - price
+        - stock
+        - code
+        - category
+  requestBodies:
+    updateProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        thumbnail:
+          type: string
+          description: Imagen del producto
+        code:
+          type: string
+          description: Código del producto
+        stock:
+          type: number
+          description: Stock del producto
+        status:
+          type: string
+          description: Estado del producto
+        category:
+          type: string
+          description: Categoría del producto
+        owner:
+          type: string
+          description: ID del usuario que creó el producto
+        example:
+          title: "Producto de ejemplo"
+          description: "Descripción de ejemplo"
+          price: 100
+          thumbnail: "https://cdn3.iconfinder.com/data/icons/education-209/64/bus-vehicle-transport-school-128.png"
+          code: "1234"
+          stock: 10
+          status: "active"
+          category: "Autos"
+          owner: "admin"

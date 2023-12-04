@@ -10,7 +10,7 @@ import {
 import { authPremium } from "../middleware/auth.middleware.js";
 const router = express.Router();
 router.get("/", getProducts);
-router.get("/mockingproducts’", getMockedProducts);
+router.get("/mockingproducts", getMockedProducts);
 router.get("/:pid", getProductById);
 router.post("/", authPremium, addProduct);
 router.put("/:id", authPremium, updateProduct);

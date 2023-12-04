@@ -14,6 +14,8 @@ import { options } from "./config/process.js";
 import cors from "cors";
 import errorHandler from "./middleware/errors/index.js";
 import { addLogger } from "./utils/loggerCustom.js";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
 /* Run server */
 const app = express();
 const PORT = options.port || 8080;
@@ -187,7 +189,20 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+/* Swagger */
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.3",
+    info: {
+      title: "Documentación del Product Manager",
+      description: "API pensada para el Product Manager",
+    },
+  },
+  apis: [`${__dirname}/../docs/**/*.yaml`],
+};
+console.log(__dirname);
 
+const specs = swaggerJSDoc(swaggerOptions);
 /* Routes */
 import product_routes from "./routes/product.router.js";
 import cart_routes from "./routes/cart.router.js";
@@ -199,6 +214,7 @@ app.use("/api/carts", cart_routes);
 app.use("/api/messages", message_routes);
 app.use("/api/sessions", session_routes);
 app.use("/api/users", user_routes);
+app.use("/api/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 // Ruta o método de prueba para el API
 app.get("/datos-autor", (req, res) => {
   req.logger.info("Hola mundo");

@@ -1,0 +1,305 @@
+paths:
+  /api/carts:
+    post:
+      summary: Crear un nuevo carrito
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateCart"
+      responses:
+        200:
+          description: Carrito creado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Agregar un producto a un carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            $type: String
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateProduct"
+      responses:
+        200:
+          description: Producto agregado al carrito
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+    put:
+      summary: Actualizar un producto de un carrito por su ID
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            $type: String
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateProduct"
+      responses:
+        200:
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+    delete:
+      summary: Eliminar un producto de un carrito por su ID
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            $type: String
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            $type: String
+      responses:
+        200:
+          description: Producto eliminado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+  /api/carts/{cid}:
+    get:
+      summary: Obtiene un solo carrito por su ID
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            $type: String
+      responses:
+        200:
+          description: Carrito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/CartWithProducts"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+    put:
+      summary: Actualizar un carrito por su ID
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateCart"
+      responses:
+        200:
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+  /api/carts/{cid}/purchase:
+    put:
+      summary: Realizar una compra
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            $type: String
+      responses:
+        200:
+          description: Compra realizada
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        500:
+          description: Error interno del servidor, usualmente generado por una query defectuosa.
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: ID del producto
+              product:
+                type: string
+                description: ID del producto o el producto
+              quantity:
+                type: number
+                description: Cantidad del producto
+            required:
+              - _id
+              - product
+              - quantity
+    CartWithProducts:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: ID del producto
+              product:
+                type: object
+                properties:
+                  _id:
+                  type: string
+                  description: ID del producto autogenerado por MongoDB
+                title:
+                  type: string
+                  description: Título del producto
+                description:
+                  type: string
+                  description: Descripción del producto
+                price:
+                  type: number
+                  description: Precio del producto
+                thumbnail:
+                  type: string
+                  description: Imagen del producto
+                code:
+                  type: string
+                  description: Código del producto
+                stock:
+                  type: number
+                  description: Stock del producto
+                status:
+                  type: string
+                  description: Estado del producto
+                category:
+                  type: string
+                  description: Categoría del producto
+                owner:
+                  type: string
+                  description: ID del usuario que creó el producto
+              quantity:
+                type: number
+                description: Cantidad del producto
+            required:
+              - _id
+              - product
+              - quantity
+  requestBodies:
+    updateCart:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+                description: ID del producto
+              quantity:
+                type: number
+                description: Cantidad del producto
+              example:
+                product: 60b4b0b9e6c9a3b4c8e2b8b5
+                quantity: 1
+            required:
+              - product
+              - quantity
+        example:
+          products:
+            - product: 60b4b0b9e6c9a3b4c8e2b8b5
+              quantity: 1
+    updateProduct:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del producto
+        product:
+          type: string
+          description: ID del producto
+        quantity:
+          type: number
+          description: Cantidad del producto
+        example:
+          _id: 60b4b0b9e6c9a3b4c8e2b8b5
+          product: 60b4b0b9e6c9a3b4c8e2b8b5
+          quantity: 1
+      required:
+        - _id
+        - product
+        - quantity
