@@ -12,6 +12,19 @@ export const registerUser = async (req, res) => {
     res.redirect("/register");
   }
 };
+export const registerUserTesting = async (req, res) => {
+  try {
+    const user = await _userService.registerUser(req.body);
+    if (!user?.data) throw new Error("Error creating user");
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error creating user",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
+};
 /* Read */
 export const getUser = async (req, res) => {
   try {
@@ -46,6 +59,25 @@ export const login = async (req, res) => {
     req.session.loginFailed = true;
     req.session.registerSuccess = false;
     res.redirect("/login");
+  }
+};
+export const loginTesting = async (req, res) => {
+  try {
+    const user = await _userService.login(req.body.email, req.body.password);
+    if (!user?.data)
+      return res.status(404).send({
+        status: "error",
+        message: "User not found",
+        error: user?.error || user,
+      });
+    req.session.user = user.data;
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error login user",
+      error: error.message.replace(/"/g, "'"),
+    });
   }
 };
 /* Recovery */
