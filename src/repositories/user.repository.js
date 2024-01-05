@@ -21,9 +21,38 @@ export default class UserRepository {
       return { error: error.message };
     }
   }
+  async getUsers() {
+    try {
+      return await this.dao.getUsers();
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
   async login(email, password) {
     try {
       return await this.dao.login(email, password);
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+  /* Delete */
+  async deleteInactiveUsers() {
+    try {
+      return await this.dao.deleteInactiveUsers();
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+  async deleteUser(id) {
+    try {
+      return await this.dao.deleteUser(id);
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+  async logout(session) {
+    try {
+      return await this.dao.logout(session);
     } catch (error) {
       return { error: error.message };
     }
@@ -47,6 +76,14 @@ export default class UserRepository {
   async changeRoleUser(id, role) {
     try {
       return await this.dao.changeRoleUser(id, role);
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+  /* Documents */
+  async uploadDocuments(id, files, documents) {
+    try {
+      return await this.dao.uploadDocuments(id, files, documents);
     } catch (error) {
       return { error: error.message };
     }

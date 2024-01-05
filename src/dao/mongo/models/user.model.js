@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   age: { type: Number, required: true },
   password: { type: String, required: true },
   role: { type: String, required: true, enum: ["admin", "usuario", "premium"] },
+  documents: [{ name: String, reference: String }],
+  last_connection: { type: Date, default: Date.now },
 });
 userSchema.plugin(mongoosePaginate);
 userSchema.pre("save", function (next) {

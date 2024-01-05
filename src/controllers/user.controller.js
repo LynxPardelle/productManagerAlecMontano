@@ -44,6 +44,24 @@ export const getUser = async (req, res) => {
     });
   }
 };
+export const getUsers = async (req, res) => {
+  try {
+    const users = await _userService.getUsers();
+    if (!users?.data)
+      return res.status(404).send({
+        status: "error",
+        message: "Users not found",
+        error: users?.error || users,
+      });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error retrieving users",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
+};
 export const login = async (req, res) => {
   try {
     const user = await _userService.login(req.body.email, req.body.password);
@@ -59,6 +77,43 @@ export const login = async (req, res) => {
     req.session.loginFailed = true;
     req.session.registerSuccess = false;
     res.redirect("/login");
+  }
+};
+/* Delete */
+export const deleteInactiveUsers = async (req, res) => {
+  try {
+    const users = await _userService.deleteInactiveUsers();
+    if (!users?.data)
+      return res.status(404).send({
+        status: "error",
+        message: "Users not found",
+        error: users?.error || users,
+      });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error retrieving users",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
+};
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await _userService.deleteUser(req.params.id);
+    if (!user?.data)
+      return res.status(404).send({
+        status: "error",
+        message: "User not found",
+        error: user?.error || user,
+      });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error retrieving user",
+      error: error.message.replace(/"/g, "'"),
+    });
   }
 };
 export const loginTesting = async (req, res) => {
@@ -128,6 +183,29 @@ export const changeRoleUser = async (req, res) => {
     const user = await _userService.changeRoleUser(
       req.params.uid,
       req.params.role || "premium"
+    );
+    if (!user?.data)
+      return res.status(404).send({
+        status: "error",
+        message: "User not found",
+        error: user?.error || user,
+      });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error retrieving user",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
+};
+/* Documents */
+export const uploadDocuments = async (req, res) => {
+  try {
+    const user = await _userService.uploadDocuments(
+      req.params.uid,
+      req.files,
+      req.body.documents
     );
     if (!user?.data)
       return res.status(404).send({

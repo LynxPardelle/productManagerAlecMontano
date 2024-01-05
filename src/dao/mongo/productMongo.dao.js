@@ -1,4 +1,5 @@
 import { productModel } from "./models/product.model.js";
+import emailService from "../../services/mail/mail.js";
 export default {
   /* Create */
   async addProduct(product, user) {
@@ -161,8 +162,27 @@ export default {
         (user.role === "premium" && user._id !== product.owner)
       )
         throw new Error("You don't have permission to update this product");
-      let productDeleter = await productModel.deleteOne({ _id: product._id });
-      if (!productDeleter) throw new Error("Error deleting product");
+      let productDeleted = await productModel.deleteOne({ _id: product._id });
+      if (!productDeleted) throw new Error("Error deleting product");
+      /* Send Email to the product owner if any */
+      const owner = await userModel.findOne({ _id: product.owner });
+      if (
+        !!owner &&
+        !!owner.email &&
+        !!owner.role &&
+        owner.role === "premium"
+      ) {
+        const mailBody = `
+        <h1>Product eliminado</h1>
+        <p>El producto ${product.title} ha sido eliminado.</p>
+        `;
+        const emailResult = await emailService.sendEmail(
+          owner.email,
+          "Product eliminado",
+          mailBody
+        );
+        console.log(emailResult);
+      }
       return {
         status: "success",
         message: "Product deleted successfully",

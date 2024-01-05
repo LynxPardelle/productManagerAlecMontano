@@ -49,6 +49,13 @@
                 Mi perfil
               </a>
             </li>
+            {{#if isAdmin}}
+              <li>
+                <a class="nav-link active" href="/users">
+                  Usuarios
+                </a>
+              </li>
+            {{/if}}
             <li>
               <button id="logout" class="btn btn-dark">
                 Cerrar Sesión

@@ -7,5 +7,7 @@ export default class UserDTO {
     this.age = user.age ?? 0;
     this.password = user.password ?? "Unknow";
     this.role = user.role ?? "Unknow";
+    this.documents = user.documents ?? [];
+    this.last_connection = user.last_connection ?? Date.now();
   }
 }

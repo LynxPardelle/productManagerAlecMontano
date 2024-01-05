@@ -1,5 +1,5 @@
 import UserDTO from "../dao/DTOs/user.DTO.js";
-
+import { _userService } from "../repositories/index.repository.js";
 export const sesion = (req, res) => {
   const username =
     req.session.user.first_name + " " + req.session.user.last_name;
@@ -12,10 +12,17 @@ export const sesion = (req, res) => {
   }
 };
 export const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (!err) res.send("Logout ok");
-    else res.json({ status: "Logout ERROR", body: err });
-  });
+  try {
+    const logout = _userService.logout(req.session);
+    if (!logout?.data) throw new Error("Error logging out user");
+    res.status(200).json(logout);
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      message: "Error logging out user",
+      error: error.message.replace(/"/g, "'"),
+    });
+  }
 };
 export const githubcallback = async (req, res) => {
   req.session.user = req.user;
