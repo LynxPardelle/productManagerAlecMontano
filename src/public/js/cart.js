@@ -9,7 +9,7 @@ let purchasedInfo = {};
 getCart();
 async function createCart() {
   if (!carritoId) {
-    let cart = await fetch("http://localhost:8080/api/carts/", {
+    let cart = await fetch(window.location.origin + "/api/carts/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,7 +25,7 @@ async function createCart() {
 async function addProductToCart(pid) {
   try {
     let cartUpdated = await fetch(
-      `http://localhost:8080/api/carts/${carritoId}/product/${pid}`,
+      `${window.location.origin}/api/carts/${carritoId}/product/${pid}`,
       {
         method: "POST",
         headers: {
@@ -43,7 +43,7 @@ async function addProductToCart(pid) {
 async function deleteProductFromCart(pid) {
   try {
     let cartUpdated = await fetch(
-      `http://localhost:8080/api/carts/${carritoId}/product/${pid}`,
+      `${window.location.origin}/api/carts/${carritoId}/product/${pid}`,
       {
         method: "DELETE",
         headers: {
@@ -61,7 +61,7 @@ async function deleteProductFromCart(pid) {
 async function getCart() {
   createCart();
   try {
-    let cart = await fetch(`http://localhost:8080/api/carts/${carritoId}`);
+    let cart = await fetch(`${window.location.origin}/api/carts/${carritoId}`);
     if (!cart.status === 200) throw new Error("Error getting cart");
     cart = await cart.json();
     console.log(cart);
@@ -151,7 +151,7 @@ async function getCart() {
 async function purchaseCart() {
   try {
     let purchase = await fetch(
-      `http://localhost:8080/api/carts/${carritoId}/purchase`,
+      `${window.location.origin}/api/carts/${carritoId}/purchase`,
       {
         method: "PUT",
         headers: {

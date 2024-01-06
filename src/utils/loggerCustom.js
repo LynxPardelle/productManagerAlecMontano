@@ -1,6 +1,6 @@
 import winston from "winston";
 import { options } from "../config/process.js";
-const environment = !!options.dev ? "development" : "production";
+const environment = !options.prod ? "development" : "production";
 
 const customLevelsOptions = {
   levels: {

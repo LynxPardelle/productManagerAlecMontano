@@ -3,7 +3,7 @@ if (!!logout) {
   logout.addEventListener("click", (e) => {
     e.preventDefault();
     console.log("logout");
-    fetch("http://localhost:8080/api/sessions/logout").then((res) => {
+    fetch(window.location.origin + "/api/sessions/logout").then((res) => {
       console.log(res);
       if (res.ok || res.statusText === "Unauthorized")
         return (window.location = "/login");

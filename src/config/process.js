@@ -4,7 +4,7 @@ const program = new Command();
 
 program
   .option("-p, --port <port>", "server port", 8080)
-  .option("-d, --dev", "development mode", true)
+  .option("-pr, --prod", "production mode", false)
   .option("-c, --config <configFilePath>", "config file path")
   .parse(process.argv);
 console.info("Arguments", program.args);
@@ -16,7 +16,7 @@ process.on("uncaughtException", (err) => {
   console.error("There was an uncaught error", err);
   process.exit(1); //mandatory (as per the Node.js docs)
 });
-process.on("SIGINT", () => {
+/* process.on("SIGINT", () => {
   console.info("Received SIGINT. Press Control-D to exit.");
 });
 process.on("SIGTERM", () => {
@@ -25,5 +25,6 @@ process.on("SIGTERM", () => {
 process.on("SIGUSR2", () => {
   console.info("Received SIGUSR2. Press Control-D to exit.");
 });
+*/
 
 export const options = program.opts();

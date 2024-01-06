@@ -16,6 +16,7 @@ import errorHandler from "./middleware/errors/index.js";
 import { addLogger } from "./utils/loggerCustom.js";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
+import config from "./config/config.js";
 /* Run server */
 const app = express();
 const PORT = options.port || 8080;
@@ -68,7 +69,7 @@ io.on("connection", (socket) => {
       switch (true) {
         case option === "all":
           let productsFromServer = await fetch(
-            "http://localhost:8080/api/products/"
+            config.origin + "/api/products/"
           );
           if (productsFromServer.status === 200) {
             products = await productsFromServer.json();
@@ -79,8 +80,7 @@ io.on("connection", (socket) => {
           break;
         case option.includes("filter:"):
           let productsFromServerFiltered = await fetch(
-            "http://localhost:8080/api/products/" +
-              option.replace("filter:", "")
+            config.origin + "/api/products/" + option.replace("filter:", "")
           );
           if (productsFromServerFiltered.status === 200) {
             products = await productsFromServerFiltered.json();
@@ -120,16 +120,13 @@ io.on("connection", (socket) => {
         status: "error",
         message: "No se pudo enviar el mensaje.",
       };
-      let messageFromServer = await fetch(
-        "http://localhost:8080/api/messages/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      let messageFromServer = await fetch(config.origin + "/api/messages/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
       if (messageFromServer.status === 200) {
         message = await messageFromServer.json();
       } else {
@@ -152,7 +149,7 @@ io.on("connection", (socket) => {
         message: "No se encontraron mensajes.",
       };
       let messagesFromServer = await fetch(
-        `http://localhost:8080/api/messages/?limit=${limit}`
+        `${config.origin}/api/messages/?limit=${limit}`
       );
       if (messagesFromServer.status === 200) {
         messages = await messagesFromServer.json();

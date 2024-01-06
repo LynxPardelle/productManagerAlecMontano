@@ -313,7 +313,7 @@ export default {
         <h1>Recuperación de contraseña</h1>
         <p>Estimado ${user.first_name} ${user.last_name},</p>
         <p>Para recuperar su contraseña, haga click en el siguiente enlace:</p>
-        <a href="http://localhost:8080/reset?token=${token}">Recuperar contraseña</a>
+        <a href="${config.origin}/reset?token=${token}">Recuperar contraseña</a>
         <p>Si no solicitó recuperar su contraseña, por favor ignore este mensaje.</p>
       `;
       const emailResult = await emailService(

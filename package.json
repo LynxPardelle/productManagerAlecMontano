@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/app.js",
+    "str:prod": "node ./src/app.js -pr",
     "dev": "nodemon ./src/app.js",
     "test": "mocha test/*.js",
     "testChai": "mocha test/chai*.js",

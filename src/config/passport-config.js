@@ -10,7 +10,7 @@ export default () => {
       {
         clientID: config.gitHubClientId,
         clientSecret: config.gitHubClientSecret,
-        callbackURL: "http://localhost:8080/api/sessions/githubcallback",
+        callbackURL: config.origin + "/api/sessions/githubcallback",
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
