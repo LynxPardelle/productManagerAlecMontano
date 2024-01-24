@@ -21,4 +21,5 @@ export default {
   origin: process.env.ORIGIN.includes("localhost")
     ? process.env.ORIGIN + port
     : process.env.ORIGIN,
+  sessionSecret: process.env.SESSION_SECRET,
 };

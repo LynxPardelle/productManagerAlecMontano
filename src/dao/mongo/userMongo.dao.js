@@ -125,6 +125,7 @@ export default {
           email: "adminCoder@coder.com",
           age: 99,
           role: "admin",
+          _id: 0,
         };
         return {
           status: "success",
@@ -137,7 +138,7 @@ export default {
         console.log(email);
         console.log(password);
         console.log(isValidPassword(user, password));
-        if (!user && user.password !== isValidPassword(user, password)) {
+        if (!user || !isValidPassword(user, password)) {
           throw new Error("User not found");
         }
         user.last_connection = Date.now();
@@ -145,7 +146,7 @@ export default {
         if (!userUpdated) {
           throw new Error("Error updating user");
         }
-        const { first_name, last_name, age, role, documents } = user;
+        const { first_name, last_name, age, role, documents, _id } = user;
         return {
           status: "success",
           message: "User retrieved successfully",
@@ -155,7 +156,8 @@ export default {
             email: email,
             age: age,
             role: role,
-            documents,
+            documents: documents,
+            _id: _id,
           },
         };
       }
@@ -263,7 +265,7 @@ export default {
   },
   async logout(session) {
     try {
-      const user = await userModel.findOne({ email: req.session.email });
+      const user = await userModel.findOne({ email: session.user.email });
       if (!user) {
         throw new Error("User not found");
       }
@@ -276,13 +278,12 @@ export default {
         throw new Error("Error updating user");
       }
       session.destroy((err) => {
-        if (!err) res.send("Logout ok");
-        else res.json({ status: "Logout ERROR", body: err });
+        if (err) throw new Error("Error logging out user");
       });
       return {
         status: "success",
         message: "User logged out successfully",
-        data: userUpdated.last_connection,
+        data: user.last_connection,
       };
     } catch (error) {
       return {

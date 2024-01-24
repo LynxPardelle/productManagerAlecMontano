@@ -30,12 +30,14 @@ export default {
       if (!cart) throw new Error("Cart not found");
       let realProduct = await productModel.findOne({ _id: pid });
       if (!realProduct) throw new Error("Product not found");
+      console.log("realProduct", realProduct);
+      console.log("uid", uid);
       if (realProduct.owner === uid)
         throw new Error("You can't add your own product to your cart");
       let product = cart.products
         ? await cart.products.find((product) => {
             let productId = product._id
-              .toString()
+              ?.toString()
               .replace(/"/g, "")
               .replace("new ObjectId(", "")
               .replace(")", "");
@@ -156,7 +158,7 @@ export default {
       cart.products = await Promise.all(
         cart.products.map(async (product) => {
           let productId = product._id
-            .toString()
+            ?.toString()
             .replace(/"/g, "")
             .replace("new ObjectId(", "")
             .replace(")", "");

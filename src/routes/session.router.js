@@ -10,8 +10,8 @@ import {
 } from "../controllers/session.controller.js";
 import { login } from "./../controllers/user.controller.js";
 const router = express.Router();
-router.get("/sesion", auth, sesion);
-router.get("/login", login);
+router.get("/session", auth, sesion);
+router.post("/login", login);
 router.get("/logout", auth, logout);
 router.get(
   "/github",

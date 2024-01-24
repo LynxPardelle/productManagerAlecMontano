@@ -21,6 +21,7 @@ export const addCart = async (req, res) => {
 };
 export const addProductToCart = async (req, res) => {
   try {
+    console.log("req.session.user", req.session.user);
     const cart = await _cartService.addProductToCart(
       req.params.cid,
       req.params.pid,

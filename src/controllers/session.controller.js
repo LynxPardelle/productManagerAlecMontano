@@ -11,10 +11,14 @@ export const sesion = (req, res) => {
     res.send(`Bienvenido ${username}`);
   }
 };
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
   try {
-    const logout = _userService.logout(req.session);
+    console.log("logout");
+    console.log(req.session);
+    const logout = await _userService.logout(req.session);
+    console.log(logout);
     if (!logout?.data) throw new Error("Error logging out user");
+    console.log(logout);
     res.status(200).json(logout);
   } catch (error) {
     res.status(500).send({

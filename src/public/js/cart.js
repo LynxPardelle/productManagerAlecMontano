@@ -6,6 +6,7 @@ if (!!cartId) {
 }
 let purchased = false;
 let purchasedInfo = {};
+let fullCart = {};
 getCart();
 async function createCart() {
   if (!carritoId) {
@@ -35,7 +36,9 @@ async function addProductToCart(pid) {
     );
     if (!cartUpdated.status === 200) throw new Error("Error updating cart");
     cartUpdated = await cartUpdated.json();
-    getCart();
+    console.log(cartUpdated);
+    if (cartUpdated.status === "error") throw new Error(cartUpdated.message);
+    getCart("add", pid);
   } catch (error) {
     console.error(error);
   }
@@ -53,18 +56,20 @@ async function deleteProductFromCart(pid) {
     );
     if (!cartUpdated.status === 200) throw new Error("Error updating cart");
     cartUpdated = await cartUpdated.json();
-    getCart();
+    if (cartUpdated.status === "error") throw new Error(cartUpdated.message);
+    getCart("delete", pid);
   } catch (error) {
     console.error(error);
   }
 }
-async function getCart() {
+async function getCart(type = undefined, pid = undefined) {
   createCart();
   try {
     let cart = await fetch(`${window.location.origin}/api/carts/${carritoId}`);
     if (!cart.status === 200) throw new Error("Error getting cart");
     cart = await cart.json();
     console.log(cart);
+    fullCart = cart.data;
     /* Search for cart-show element if not cart-show element, create an button in body with position-absolute top-0 and end-0 classes to go to /cart/:id route */
     let cartShow = document.getElementById("cart-show");
     if (!cartShow) {
@@ -143,6 +148,41 @@ async function getCart() {
         }
       }, 100);
     }
+    if (type && pid && (type === "add" || type === "delete")) {
+      let product = fullCart.products.find(
+        (product) => product.product._id === pid
+      );
+      if (alertPlaceholder) alertPlaceholder.innerHTML = "";
+      if (product) {
+        console.log("product", product);
+        appendAlert(
+          `
+        ¡Has ${type === "add" ? "agregado" : "quitado"} un producto ${
+            type === "add" ? "al" : "del"
+          } carrito!
+        <br/>
+        Producto: ${product.product.title}
+        <br/>
+        Cantidad: ${product.quantity}
+        <br/>
+        <button onclick="addProductToCart('${
+          product.product._id
+        }')" class="btn btn-dark">Agregar 1</button>
+        <button onclick="deleteProductFromCart('${
+          product.product._id
+        }')" class="btn btn-dark">Eliminar 1</button>
+        `,
+          type === "add" ? "success" : "danger"
+        );
+      } else {
+        appendAlert(
+          `
+        ¡Has eliminado un producto del carrito!
+        `,
+          "danger"
+        );
+      }
+    }
   } catch (error) {
     console.error(error);
   }
@@ -170,3 +210,16 @@ async function purchaseCart() {
     console.error(error);
   }
 }
+
+const alertPlaceholder = document.getElementById("cartAlerts");
+const appendAlert = (message, type) => {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = [
+    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+    `   <div>${message}</div>`,
+    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+    "</div>",
+  ].join("");
+
+  alertPlaceholder.append(wrapper);
+};

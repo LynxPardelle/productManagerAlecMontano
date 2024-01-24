@@ -64,19 +64,33 @@ export const getUsers = async (req, res) => {
 };
 export const login = async (req, res) => {
   try {
-    const user = await _userService.login(req.body.email, req.body.password);
+    let { email, password } = req.body;
+    console.log("email", email, "password", password);
+    if (!email || !password) throw new Error("Email and password are required");
+    const user = await _userService.login(email, password);
     if (!user?.data)
       return res.status(404).send({
         status: "error",
         message: "User not found",
         error: user?.error || user,
       });
+    console.log("user", user);
     req.session.user = user.data;
-    res.redirect("/products");
+    if (req.session.counter) {
+      req.session.counter++;
+    } else {
+      req.session.counter = 1;
+    }
+    console.log("user", req.session);
+    res.status(200).json(user);
   } catch (error) {
     req.session.loginFailed = true;
     req.session.registerSuccess = false;
-    res.redirect("/login");
+    res.status(500).send({
+      status: "error",
+      message: "Error login to user",
+      error: error.message.replace(/"/g, "'"),
+    });
   }
 };
 /* Delete */

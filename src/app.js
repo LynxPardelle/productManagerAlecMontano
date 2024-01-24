@@ -30,10 +30,9 @@ app.use(
   session({
     store: MongoStore.create({
       mongoUrl: mongoUrl,
-      ttl: 15,
+      ttl: 1000,
     }),
-    /* TODO: Add secret with dot env */
-    secret: "secret",
+    secret: config.sessionSecret,
     resave: true,
     saveUninitialized: true,
   })
